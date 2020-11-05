@@ -11,8 +11,8 @@ import {
 import styles from "./styles";
 import { firebase } from "../../firebase/config";
 import { Icon } from "react-native-elements";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faAngleDoubleUp, faCalendar } from "@fortawesome/free-solid-svg-icons";
 
 export default function TaskView({ route }) {
   const [entityText, setEntityText] = useState("");
@@ -129,8 +129,7 @@ export default function TaskView({ route }) {
       >
         <View
           style={{
-            flex: 1,
-            flexDirection: "column",
+            flexDirection: "row",
             margin: 1,
           }}
         >
@@ -155,22 +154,24 @@ export default function TaskView({ route }) {
               color={item.isCompleted ? "green" : "red"}
             ></Icon>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.deletebutton}
-            onPress={() => upPriority(index)}
+          <View
+            style={{
+              flexDirection: "row",
+              margin: 1,
+            }}
           >
-            <FontAwesomeIcon icon={faAngleDoubleUp} />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.faIcons}
+              onPress={() => upPriority(index)}
+            >
+              <FontAwesomeIcon icon={faAngleDoubleUp} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.faIcons} onPress={null}>
+              <FontAwesomeIcon icon={faCalendar} />
+            </TouchableOpacity>
+          </View>
         </View>
-        <View
-          style={{
-            flex: 3,
-            flexDirection: "column",
-            margin: 1,
-          }}
-        >
-          <Text style={styles.entityText}>{item.text}</Text>
-        </View>
+        <Text style={styles.entityText}>{item.text}</Text>
       </View>
     </View>
   );

@@ -53,7 +53,8 @@ export default StyleSheet.create({
   },
   deletebutton: {
     width: "20%",
-    alignSelf: "flex-end",
-    color: "red",
+  },
+  faIcons: {
+    width: "30%",
   },
 });
