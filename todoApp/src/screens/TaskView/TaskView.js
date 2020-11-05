@@ -11,9 +11,10 @@ import {
 import styles from "./styles";
 import { firebase } from "../../firebase/config";
 import { Icon } from "react-native-elements";
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons'
 
-export default function TaskView({ route, navigation }) {
-  let tasks = route.params.tasks;
+export default function TaskView({ route }) {
   const [entityText, setEntityText] = useState("");
   const [tasks, setTasks] = useState(null);
 
@@ -83,7 +84,7 @@ export default function TaskView({ route, navigation }) {
 
       //Update db
       docRef.update({ tasks: newTasks });
-      settasks(newTasks);
+      setTasks(newTasks);
     });
   }
 
@@ -93,10 +94,22 @@ export default function TaskView({ route, navigation }) {
       console.log(oldtasks);
       oldtasks[index].isCompleted = !oldtasks[index].isCompleted;
       docRef.update({ tasks: oldtasks });
-      settasks(oldtasks);
+      setTasks(oldtasks);
     });
 
     // docRef.update
+  }
+
+  function upPriority(index) {
+    if (index == 0) return;
+    docRef.get().then((snapshot) => {
+      let oldtasks = snapshot.data().tasks;
+      let temp = oldtasks[index];
+      oldtasks[index] = oldtasks[index - 1];
+      oldtasks[index - 1] = temp;
+      docRef.update({ tasks: oldtasks });
+      setTasks(oldtasks);
+    });
   }
 
   const renderTask = ({ item, index }) => (
@@ -129,7 +142,7 @@ export default function TaskView({ route, navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.deletebutton}
-            onPress={() => editProject(item)}
+            // onPress={() => }
           >
             <Icon name="edit"></Icon>
           </TouchableOpacity>
@@ -144,9 +157,9 @@ export default function TaskView({ route, navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.deletebutton}
-            onPress={() => editProject(item)}
+            onPress={() => upPriority(index)}
           >
-            <Icon name="calendar"></Icon>
+            <FontAwesomeIcon icon={faAngleDoubleUp} />
           </TouchableOpacity>
         </View>
         <View

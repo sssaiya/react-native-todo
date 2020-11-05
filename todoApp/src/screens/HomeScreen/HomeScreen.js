@@ -19,6 +19,7 @@ export default function HomeScreen(props) {
   const navigation = props.navigation;
   const [entityText, setEntityText] = useState("");
   const [projects, setProjects] = useState([]);
+  const [newName, setnewProject] = useState("");
 
   const entityRef = firebase.firestore().collection("projects");
   const userID = props.extraData.id;
@@ -29,7 +30,7 @@ export default function HomeScreen(props) {
     setVisible(true);
   };
 
-  const handleCancel = () => {
+  const hideDialog = () => {
     setVisible(false);
   };
 
@@ -92,9 +93,18 @@ export default function HomeScreen(props) {
           {/* <Button title="Show dialog" onPress={showDialog} /> */}
           <Dialog.Container visible={visible}>
             <Dialog.Title>Edit project</Dialog.Title>
-            <Dialog.Input placeholder={"New project name"}></Dialog.Input>
-            <Dialog.Button label="Cancel" onPress={handleCancel} />
-            {/* <Dialog.Button label="Confirm" onPress={handleConfirmEdit(item)} /> */}
+            <Dialog.Input
+              placeholder={"New project name"}
+              onChangeText={(newN) => setnewProject(newN)}
+            ></Dialog.Input>
+            <Dialog.Button label="Cancel" onPress={hideDialog} />
+            <Dialog.Button
+              label="Confirm"
+              onPress={() => {
+                firebase.firestore().collection("projects").doc(item.id).update({'text': newName});
+                hideDialog();
+              }}
+            />
           </Dialog.Container>
         </View>
         <TouchableOpacity onPress={() => renderProjectTaskView(item.id)}>
@@ -198,6 +208,9 @@ function deleteproject(docId) {
   firebase.firestore().collection("projects").doc(docId).delete();
 }
 
+function handleConfirmEdit(id, newN) {
+  firebase.firestore().collection("projects").doc(id).update("text", newN);
+}
 //Function to get a random color for each new project background
 function getRandomColor() {
   var letters = "BCDEF".split("");
