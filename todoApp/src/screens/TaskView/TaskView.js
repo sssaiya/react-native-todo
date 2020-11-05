@@ -15,12 +15,25 @@ import { Icon } from "react-native-elements";
 export default function TaskView({ route, navigation }) {
   let tasks = route.params.tasks;
   const [entityText, setEntityText] = useState("");
+  const [tasks, setTasks] = useState(null);
 
   const entityRef = firebase.firestore().collection("projects");
   const docRef = firebase
     .firestore()
     .collection("projects")
     .doc(route.params.docId);
+
+  useEffect(() => {
+    docRef.onSnapshot(
+      (querySnapshot) => {
+        const newTasks = querySnapshot.data().tasks;
+        setTasks(newTasks);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }, []);
 
   const onAddButtonPress = () => {
     if (entityText && entityText.length > 0) {
@@ -70,7 +83,7 @@ export default function TaskView({ route, navigation }) {
 
       //Update db
       docRef.update({ tasks: newTasks });
-      tasks = newTasks;
+      settasks(newTasks);
     });
   }
 
@@ -80,6 +93,7 @@ export default function TaskView({ route, navigation }) {
       console.log(oldtasks);
       oldtasks[index].isCompleted = !oldtasks[index].isCompleted;
       docRef.update({ tasks: oldtasks });
+      settasks(oldtasks);
     });
 
     // docRef.update
@@ -183,7 +197,7 @@ export default function TaskView({ route, navigation }) {
             ItemSeparatorComponent={ItemSeparatorLine}
             renderItem={renderTask}
             //Setting the number of column
-            numColumns={2}
+            numColumns={1}
             keyExtractor={(item) => item.id}
           />
         </View>
