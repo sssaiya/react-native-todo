@@ -2,7 +2,12 @@ import "react-native-gesture-handler";
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { LoginScreen, HomeScreen, RegistrationScreen } from "./src/screens";
+import {
+  LoginScreen,
+  HomeScreen,
+  RegistrationScreen,
+  TaskView,
+} from "./src/screens";
 import { decode, encode } from "base-64";
 import { firebase } from "./src/firebase/config";
 
@@ -50,15 +55,23 @@ export default function App() {
       <Stack.Navigator>
         {/* If user exists, go to home screen , else go to log in screen*/}
         {user ? (
-          <Stack.Screen name="Home">
-            {(props) => <HomeScreen {...props} extraData={user} />}
-          </Stack.Screen>
+          <>
+            <Stack.Screen name="Home">
+              {(props) => <HomeScreen {...props} extraData={user} />}
+            </Stack.Screen>
+            <Stack.Screen name="TaskView">
+              {(props) => <TaskView {...props} />}
+            </Stack.Screen>
+          </>
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Registration" component={RegistrationScreen} />
             <Stack.Screen name="Home">
               {(props) => <HomeScreen {...props} extraData={user} />}
+            </Stack.Screen>
+            <Stack.Screen name="TaskView">
+              {(props) => <TaskView {...props} extraData={tasks} />}
             </Stack.Screen>
           </>
         )}
