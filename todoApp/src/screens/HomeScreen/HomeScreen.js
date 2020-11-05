@@ -6,10 +6,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import styles from "./styles";
 import { firebase } from "../../firebase/config";
-// import { useNavigation } from "@react-navigation/native";
+import { Icon } from "react-native-elements";
 
 export default function HomeScreen(props) {
   // const { navigation } = this.props.navigation;
@@ -48,7 +49,7 @@ export default function HomeScreen(props) {
         authorID: userID,
         createdAt: timestamp,
         color: getRandomColor(),
-        tasks: []
+        tasks: [],
       };
       entityRef
         .add(data)
@@ -79,6 +80,18 @@ export default function HomeScreen(props) {
               height: 100,
             }}
           >
+            <TouchableOpacity
+              style={styles.deletebutton}
+              onPress={() => confirmDelete(item)}
+            >
+              <Icon name="delete"></Icon>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deletebutton}
+              onPress={() => console.log("Editing")}
+            >
+              <Icon name="edit"></Icon>
+            </TouchableOpacity>
             <Text style={styles.entityText}>{item.text}</Text>
           </View>
         </TouchableOpacity>
@@ -97,9 +110,6 @@ export default function HomeScreen(props) {
       .catch((error) => {});
   };
 
-  const GetGridViewItem = ({ item }) => {
-    Alert.alert(item);
-  };
   const ItemSeparatorLine = () => {
     return (
       <View
@@ -142,6 +152,25 @@ export default function HomeScreen(props) {
       )}
     </View>
   );
+}
+
+function confirmDelete(item) {
+  const title = "Confirm Delete";
+  const message = `Delete ${item.text}?`;
+  const buttons = [
+    {
+      text: "Yes",
+      onPress: () => deleteproject(item.id),
+    },
+    {
+      text: "No",
+      type: "cancel",
+    },
+  ];
+  Alert.alert(title, message, buttons);
+}
+function deleteproject(docId) {
+  firebase.firestore().collection("projects").doc(docId).delete();
 }
 
 //Function to get a random color for each new project background

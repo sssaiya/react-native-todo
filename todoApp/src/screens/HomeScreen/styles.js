@@ -40,14 +40,21 @@ export default StyleSheet.create({
     padding: 20,
   },
   entityContainer: {
+    flexDirection: "row",
     marginTop: 16,
     borderBottomColor: "#cccccc",
     borderBottomWidth: 1,
     paddingBottom: 16,
   },
   entityText: {
+    width:"80%",
     fontSize: 30,
     color: "#333333",
-    textAlign:"center"
+    textAlign: "center",
+  },
+  deletebutton: {
+    width: "20%",
+    alignSelf: "flex-end",
+    color: "red",
   },
 });
