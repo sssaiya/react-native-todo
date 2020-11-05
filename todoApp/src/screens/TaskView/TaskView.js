@@ -6,22 +6,28 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import styles from "./styles";
 import { firebase } from "../../firebase/config";
-import { roundToNearestPixel } from "react-native/Libraries/Utilities/PixelRatio";
+import { Icon } from "react-native-elements";
 
 export default function TaskView({ route, navigation }) {
-  const tasks = route.params.tasks;
+  let tasks = route.params.tasks;
   const [entityText, setEntityText] = useState("");
 
   const entityRef = firebase.firestore().collection("projects");
+  const docRef = firebase
+    .firestore()
+    .collection("projects")
+    .doc(route.params.docId);
 
   const onAddButtonPress = () => {
     if (entityText && entityText.length > 0) {
       const newTask = {
         text: entityText,
         color: getRandomColor(),
+        isCompleted: false,
       };
       tasks.push(newTask);
       entityRef
@@ -36,6 +42,48 @@ export default function TaskView({ route, navigation }) {
         });
     }
   };
+
+  function confirmDelete(item) {
+    const title = "Confirm Delete";
+    const message = `Delete ${item.text}?`;
+    const buttons = [
+      {
+        text: "Yes",
+        onPress: () => deleteproject(item.text),
+      },
+      {
+        text: "No",
+        type: "cancel",
+      },
+    ];
+    Alert.alert(title, message, buttons);
+  }
+  function deleteproject(taskToDelete) {
+    let newTasks = [];
+    //Make new array with old tasks minus the one to delete
+
+    docRef.get().then((querySnapshot) => {
+      console.log(querySnapshot.data().tasks);
+      querySnapshot.data().tasks.forEach((task) => {
+        if (task.text != taskToDelete) newTasks.push(task);
+      });
+
+      //Update db
+      docRef.update({ tasks: newTasks });
+      tasks = newTasks;
+    });
+  }
+
+  function completeTask(index) {
+    docRef.get().then((snapshot) => {
+      let oldtasks = snapshot.data().tasks;
+      console.log(oldtasks);
+      oldtasks[index].isCompleted = !oldtasks[index].isCompleted;
+      docRef.update({ tasks: oldtasks });
+    });
+
+    // docRef.update
+  }
 
   const renderTask = ({ item, index }) => (
     <View
@@ -52,7 +100,50 @@ export default function TaskView({ route, navigation }) {
           height: 100,
         }}
       >
-        <Text style={styles.entityText}>{item.text}</Text>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "column",
+            margin: 1,
+          }}
+        >
+          <TouchableOpacity
+            style={styles.deletebutton}
+            onPress={() => confirmDelete(item)}
+          >
+            <Icon name="delete" color="red"></Icon>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deletebutton}
+            onPress={() => editProject(item)}
+          >
+            <Icon name="edit"></Icon>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deletebutton}
+            onPress={() => completeTask(index)}
+          >
+            <Icon
+              name="check"
+              color={item.isCompleted ? "green" : "red"}
+            ></Icon>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deletebutton}
+            onPress={() => editProject(item)}
+          >
+            <Icon name="calendar"></Icon>
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            flex: 3,
+            flexDirection: "column",
+            margin: 1,
+          }}
+        >
+          <Text style={styles.entityText}>{item.text}</Text>
+        </View>
       </View>
     </View>
   );

@@ -7,10 +7,12 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  Button,
 } from "react-native";
 import styles from "./styles";
 import { firebase } from "../../firebase/config";
 import { Icon } from "react-native-elements";
+import Dialog from "react-native-dialog";
 
 export default function HomeScreen(props) {
   // const { navigation } = this.props.navigation;
@@ -20,6 +22,20 @@ export default function HomeScreen(props) {
 
   const entityRef = firebase.firestore().collection("projects");
   const userID = props.extraData.id;
+
+  const [visible, setVisible] = useState(false);
+
+  const showDialog = () => {
+    setVisible(true);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
+
+  function editProject(item) {
+    showDialog();
+  }
 
   useEffect(() => {
     entityRef
@@ -72,6 +88,15 @@ export default function HomeScreen(props) {
           margin: 1,
         }}
       >
+        <View style={styles.container}>
+          {/* <Button title="Show dialog" onPress={showDialog} /> */}
+          <Dialog.Container visible={visible}>
+            <Dialog.Title>Edit project</Dialog.Title>
+            <Dialog.Input placeholder={"New project name"}></Dialog.Input>
+            <Dialog.Button label="Cancel" onPress={handleCancel} />
+            {/* <Dialog.Button label="Confirm" onPress={handleConfirmEdit(item)} /> */}
+          </Dialog.Container>
+        </View>
         <TouchableOpacity onPress={() => renderProjectTaskView(item.id)}>
           <View
             style={{
@@ -84,11 +109,11 @@ export default function HomeScreen(props) {
               style={styles.deletebutton}
               onPress={() => confirmDelete(item)}
             >
-              <Icon name="delete"></Icon>
+              <Icon name="delete" color="red"></Icon>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.deletebutton}
-              onPress={() => console.log("Editing")}
+              onPress={() => editProject(item)}
             >
               <Icon name="edit"></Icon>
             </TouchableOpacity>
