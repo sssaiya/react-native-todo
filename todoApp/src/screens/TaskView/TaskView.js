@@ -9,20 +9,24 @@ import {
 } from "react-native";
 import styles from "./styles";
 import { firebase } from "../../firebase/config";
+import { roundToNearestPixel } from "react-native/Libraries/Utilities/PixelRatio";
 
-export default function TaskView(props) {
-  console.log(`extraData - ` + props.extraData);
+export default function TaskView({ route, navigation }) {
+  const tasks = route.params.tasks;
   const [entityText, setEntityText] = useState("");
 
   const entityRef = firebase.firestore().collection("projects");
 
   const onAddButtonPress = () => {
     if (entityText && entityText.length > 0) {
-      const data = props.extraData;
-      console.log(data);
+      const newTask = {
+        text: entityText,
+        color: getRandomColor(),
+      };
+      tasks.push(newTask);
       entityRef
-        .doc(props.docId)
-        .update("tasks", data)
+        .doc(route.params.docId)
+        .update("tasks", tasks)
         .then((_doc) => {
           setEntityText("");
           Keyboard.dismiss();
@@ -33,7 +37,7 @@ export default function TaskView(props) {
     }
   };
 
-  const renderProject = ({ item, index }) => (
+  const renderTask = ({ item, index }) => (
     <View
       style={{
         flex: 1,
@@ -81,12 +85,12 @@ export default function TaskView(props) {
           <Text style={styles.buttonText}>Add</Text>
         </TouchableOpacity>
       </View>
-      {props.tasks && (
+      {tasks && (
         <View style={styles.listContainer}>
           <FlatList
-            data={props.tasks}
+            data={tasks}
             ItemSeparatorComponent={ItemSeparatorLine}
-            renderItem={renderProject}
+            renderItem={renderTask}
             //Setting the number of column
             numColumns={2}
             keyExtractor={(item) => item.id}

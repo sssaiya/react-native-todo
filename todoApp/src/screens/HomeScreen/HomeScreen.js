@@ -48,6 +48,7 @@ export default function HomeScreen(props) {
         authorID: userID,
         createdAt: timestamp,
         color: getRandomColor(),
+        tasks: []
       };
       entityRef
         .add(data)
